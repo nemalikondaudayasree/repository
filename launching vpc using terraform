@@ -1,0 +1,42 @@
+resource "aws_vpc" "main" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "main"
+  }
+}
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "Main"
+  }
+}
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "main"
+  }
+}
+resource "aws_route_table" "r-t-igw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "example"
+  }
+}
+resource "aws_route_table_association" "r-t-ass" {
+  subnet_id      = aws_subnet.main.id
+  route_table_id = aws_route_table.r-t-igw.id
+}
+resource "aws_instance" "web" {
+  ami           = ""
+  instance_type = "t2.micro"
+  count = 2
+  tags = {
+    Name = "Terraform"
+  }
+}
